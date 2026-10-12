@@ -2,6 +2,7 @@ package com.project.librarymanagementsystem.service;
 
 import com.project.librarymanagementsystem.dto.BookRequestDTO;
 import com.project.librarymanagementsystem.dto.BookResponseDTO;
+import com.project.librarymanagementsystem.exception.BookNotFoundException;
 import com.project.librarymanagementsystem.model.Book;
 import com.project.librarymanagementsystem.repository.BookRepository;
 
@@ -43,50 +44,44 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public BookResponseDTO getBookById(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
 
-        Book book = bookRepository.findById(id).orElse(null);
-
-        if (book != null) {
-            return convertToResponseDTO(book);
-        }
-
-        return null;
+        return convertToResponseDTO(book);
     }
+
+
 
     @Override
     public BookResponseDTO updateBook(Long id, BookRequestDTO bookDTO) {
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
 
-        Book existingBook = bookRepository.findById(id).orElse(null);
+        existingBook.setTitle(bookDTO.getTitle());
+        existingBook.setAuthor(bookDTO.getAuthor());
+        existingBook.setCategory(bookDTO.getCategory());
+        existingBook.setPrice(bookDTO.getPrice());
 
-        if (existingBook != null) {
+        Book updatedBook = bookRepository.save(existingBook);
 
-            existingBook.setTitle(bookDTO.getTitle());
-            existingBook.setAuthor(bookDTO.getAuthor());
-            existingBook.setCategory(bookDTO.getCategory());
-            existingBook.setPrice(bookDTO.getPrice());
-
-            Book updatedBook = bookRepository.save(existingBook);
-
-            return convertToResponseDTO(updatedBook);
-        }
-
-        return null;
+        return convertToResponseDTO(updatedBook);
     }
+
+
 
     @Override
     public boolean deleteBook(Long id) {
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
 
-        if (bookRepository.existsById(id)) {
+        bookRepository.delete(existingBook);
 
-            bookRepository.deleteById(id);
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
+
 
     private BookResponseDTO convertToResponseDTO(Book book) {
 

@@ -4,6 +4,7 @@ import com.project.librarymanagementsystem.dto.BookRequestDTO;
 import com.project.librarymanagementsystem.dto.BookResponseDTO;
 import com.project.librarymanagementsystem.service.BookService;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,8 @@ public class BookController {
     }
 
     @PostMapping
-    public BookResponseDTO addBook(@RequestBody BookRequestDTO bookDTO) {
+    public BookResponseDTO addBook(
+            @Valid @RequestBody BookRequestDTO bookDTO) {
         return bookService.addBook(bookDTO);
     }
 
@@ -36,8 +38,7 @@ public class BookController {
     @PutMapping("/{id}")
     public BookResponseDTO updateBook(
             @PathVariable Long id,
-            @RequestBody BookRequestDTO bookDTO) {
-
+            @Valid @RequestBody BookRequestDTO bookDTO) {
         return bookService.updateBook(id, bookDTO);
     }
 
